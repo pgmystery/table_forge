@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FieldType, ProjectData, FieldDefinition, RowData } from './types';
 import SchemaEditor from './components/SchemaEditor';
 import DataEditor from './components/DataEditor';
 import { exportToCsv, downloadCsv, downloadJson } from './services/csvService';
 import { generateGameContent } from './services/geminiService';
-import { 
-  Table2, 
-  Save, 
-  Upload, 
-  Download, 
-  Sparkles, 
-  Layout, 
+import {
+  Table2,
+  Upload,
+  Download,
+  Sparkles,
+  Layout,
   Database,
   Loader2,
   FileJson
@@ -30,7 +29,7 @@ const App: React.FC = () => {
     schema: INITIAL_SCHEMA,
     rows: []
   });
-  
+
   const [showSchema, setShowSchema] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationPrompt, setGenerationPrompt] = useState('');
@@ -54,7 +53,7 @@ const App: React.FC = () => {
     const csv = exportToCsv(project);
     downloadCsv(csv, `${project.name.toLowerCase().replace(/\s+/g, '-')}.csv`);
   };
-  
+
   const handleSaveProject = () => {
       downloadJson(project, project.name);
   };
@@ -86,11 +85,11 @@ const App: React.FC = () => {
         alert("API Key is missing in environment variables.");
         return;
     }
-    
+
     setIsGenerating(true);
     try {
         const generatedItem = await generateGameContent(apiKey, project.schema, generationPrompt);
-        
+
         // Auto-fill image with picsum if image field exists and AI returned a description or empty
         const enrichedItem = { ...generatedItem };
         project.schema.forEach(field => {
@@ -119,8 +118,8 @@ const App: React.FC = () => {
           <div className="bg-indigo-600 p-1.5 rounded-lg shadow-lg shadow-indigo-500/30">
             <Table2 className="text-white" size={20} />
           </div>
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={project.name}
             onChange={(e) => setProject(p => ({...p, name: e.target.value}))}
             className="bg-transparent text-lg font-bold text-slate-100 focus:outline-none focus:border-b border-indigo-500 w-48 hover:bg-slate-800/50 rounded px-1 transition-colors"
@@ -129,13 +128,13 @@ const App: React.FC = () => {
 
         <div className="flex items-center gap-2">
             <div className="flex items-center bg-slate-800 rounded-lg p-1 mr-4 border border-slate-700">
-                <button 
+                <button
                     onClick={() => setShowSchema(true)}
                     className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${showSchema ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}
                 >
                     <Layout size={16} /> Structure
                 </button>
-                <button 
+                <button
                     onClick={() => setShowSchema(false)}
                     className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${!showSchema ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}
                 >
@@ -149,14 +148,14 @@ const App: React.FC = () => {
                 <input type="file" accept=".json" onChange={handleLoadProject} className="hidden" />
             </label>
 
-            <button 
+            <button
                 onClick={handleSaveProject}
                 className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-lg border border-slate-700 transition-colors"
             >
                 <FileJson size={16} /> Save
             </button>
-            
-            <button 
+
+            <button
                 onClick={handleExportCsv}
                 className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 border border-emerald-500/30 text-sm font-medium rounded-lg transition-colors ml-2"
             >
@@ -169,9 +168,9 @@ const App: React.FC = () => {
       <main className="flex-1 flex overflow-hidden">
         {/* Schema Editor Sidebar (Collapsible or always visible in Structure mode) */}
         {(showSchema) && (
-             <SchemaEditor 
-                fields={project.schema} 
-                onChange={handleSchemaChange} 
+             <SchemaEditor
+                fields={project.schema}
+                onChange={handleSchemaChange}
              />
         )}
 
@@ -182,7 +181,7 @@ const App: React.FC = () => {
                 <div className="text-sm text-slate-400">
                     {project.rows.length} items • {project.schema.length} fields
                 </div>
-                
+
                 <button
                     onClick={() => setShowAiModal(true)}
                     className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-indigo-900/50 transition-all transform hover:scale-105"
@@ -191,7 +190,7 @@ const App: React.FC = () => {
                 </button>
             </div>
 
-            <DataEditor 
+            <DataEditor
                 schema={project.schema}
                 rows={project.rows}
                 onRowsChange={handleRowsChange}
@@ -205,12 +204,12 @@ const App: React.FC = () => {
             <div className="bg-slate-900 border border-slate-700 rounded-xl w-[400px] shadow-2xl p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                        <Sparkles className="text-indigo-400" size={20} /> 
+                        <Sparkles className="text-indigo-400" size={20} />
                         Magic Fill
                     </h3>
                     <button onClick={() => setShowAiModal(false)} className="text-slate-400 hover:text-white">&times;</button>
                 </div>
-                
+
                 <p className="text-slate-400 text-sm mb-4">
                     Describe the item you want to create. The AI will match your current table structure.
                 </p>
@@ -223,13 +222,13 @@ const App: React.FC = () => {
                 />
 
                 <div className="flex justify-end gap-2">
-                    <button 
+                    <button
                         onClick={() => setShowAiModal(false)}
                         className="px-4 py-2 text-slate-300 hover:bg-slate-800 rounded-lg text-sm"
                     >
                         Cancel
                     </button>
-                    <button 
+                    <button
                         onClick={handleAiGenerate}
                         disabled={isGenerating || !generationPrompt.trim()}
                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium flex items-center gap-2"

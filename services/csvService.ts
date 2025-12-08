@@ -1,4 +1,4 @@
-import { FieldDefinition, ProjectData, RowData } from "../types";
+import { ProjectData } from "../types";
 
 export const exportToCsv = (project: ProjectData): string => {
   const headers = project.schema.map(f => f.name).join(',');
