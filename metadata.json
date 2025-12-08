@@ -1,0 +1,5 @@
+{
+  "name": "TableForge",
+  "description": "A comprehensive data asset manager for board game designers. Define custom schemas, manage content tables, visualize assets, and export to CSV. Features AI-powered content generation.",
+  "requestFramePermissions": []
+}
