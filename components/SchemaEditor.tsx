@@ -42,20 +42,20 @@ const SchemaEditor: React.FC<SchemaEditorProps> = ({ fields, onChange }) => {
     e.dataTransfer.effectAllowed = 'move';
     const row = e.currentTarget.closest('[data-row-id]');
     if (row) {
-        e.dataTransfer.setDragImage(row, 20, 20);
+      e.dataTransfer.setDragImage(row, 20, 20);
     }
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
     e.preventDefault();
-    
+
     if (draggedIndex === null) return;
     if (draggedIndex === index) return;
 
     const newFields = [...fields];
     const [draggedItem] = newFields.splice(draggedIndex, 1);
     newFields.splice(index, 0, draggedItem);
-    
+
     onChange(newFields);
     setDraggedIndex(index);
   };
@@ -66,30 +66,30 @@ const SchemaEditor: React.FC<SchemaEditorProps> = ({ fields, onChange }) => {
 
   // Helper for Key-Value Options
   const addKeyValueOption = (fieldId: string, currentOptions: { key: string; value: string }[] = []) => {
-    updateField(fieldId, { 
-        keyValueOptions: [...currentOptions, { key: 'New Label', value: 'value_1' }] 
+    updateField(fieldId, {
+      keyValueOptions: [...currentOptions, { key: 'New Label', value: 'value_1' }]
     });
   };
 
   const updateKeyValueOption = (
-      fieldId: string, 
-      optionIndex: number, 
-      key: string, 
-      value: string, 
-      currentOptions: { key: string; value: string }[]
+    fieldId: string,
+    optionIndex: number,
+    key: string,
+    value: string,
+    currentOptions: { key: string; value: string }[]
   ) => {
-      const newOptions = [...currentOptions];
-      newOptions[optionIndex] = { key, value };
-      updateField(fieldId, { keyValueOptions: newOptions });
+    const newOptions = [...currentOptions];
+    newOptions[optionIndex] = { key, value };
+    updateField(fieldId, { keyValueOptions: newOptions });
   };
 
   const removeKeyValueOption = (
-      fieldId: string, 
-      optionIndex: number, 
-      currentOptions: { key: string; value: string }[]
+    fieldId: string,
+    optionIndex: number,
+    currentOptions: { key: string; value: string }[]
   ) => {
-      const newOptions = currentOptions.filter((_, i) => i !== optionIndex);
-      updateField(fieldId, { keyValueOptions: newOptions });
+    const newOptions = currentOptions.filter((_, i) => i !== optionIndex);
+    updateField(fieldId, { keyValueOptions: newOptions });
   };
 
   return (
@@ -104,18 +104,18 @@ const SchemaEditor: React.FC<SchemaEditorProps> = ({ fields, onChange }) => {
 
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
         {fields.map((field, index) => (
-          <div 
+          <div
             key={field.id}
             data-row-id={field.id}
             onDragOver={(e) => handleDragOver(e, index)}
             className={`p-3 rounded-lg border transition-all ${
-              editingId === field.id 
-                ? 'bg-slate-800 border-indigo-500 shadow-lg shadow-indigo-500/10' 
-                : 'bg-slate-900 border-slate-700 hover:border-slate-600'
+              editingId === field.id
+              ? 'bg-slate-800 border-indigo-500 shadow-lg shadow-indigo-500/10'
+              : 'bg-slate-900 border-slate-700 hover:border-slate-600'
             } ${draggedIndex === index ? 'opacity-40 border-dashed border-slate-600' : ''}`}
           >
             <div className="flex items-start gap-2">
-              <div 
+              <div
                 className="mt-2 text-slate-500 cursor-grab active:cursor-grabbing hover:text-slate-300 touch-none"
                 draggable={true}
                 onDragStart={(e) => handleDragStart(e, index)}
@@ -123,7 +123,7 @@ const SchemaEditor: React.FC<SchemaEditorProps> = ({ fields, onChange }) => {
               >
                 <GripVertical size={16} />
               </div>
-              
+
               <div className="flex-1 space-y-3 min-w-0">
                 {/* Field Name */}
                 <div>
@@ -153,7 +153,8 @@ const SchemaEditor: React.FC<SchemaEditorProps> = ({ fields, onChange }) => {
                     <option value={FieldType.Boolean}>Checkbox (Boolean)</option>
                     <option value={FieldType.Select}>Dropdown List (Simple)</option>
                     <option value={FieldType.KeyValueSelect}>Mapped Dropdown (Key → Value)</option>
-                    <option value={FieldType.Image}>Image / URL</option>
+                    <option value={FieldType.ImageURL}>Image (URL)</option>
+                    <option value={FieldType.ImageFile}>Image (File Upload)</option>
                   </select>
                 </div>
 
@@ -173,49 +174,49 @@ const SchemaEditor: React.FC<SchemaEditorProps> = ({ fields, onChange }) => {
 
                 {/* Key-Value Select Options */}
                 {field.type === FieldType.KeyValueSelect && (
-                    <div className="bg-slate-950 border border-slate-700 rounded p-2 mt-2">
-                        <label className="block text-[10px] uppercase font-bold text-slate-500 mb-2">Mapped Options</label>
-                        <div className="grid grid-cols-[1fr_1fr_20px] gap-2 items-center mb-2">
-                             <span className="text-[10px] text-slate-400 font-medium pl-1">Display Label</span>
-                             <span className="text-[10px] text-slate-400 font-medium pl-1">Export Value</span>
-                             <span></span>
-                        </div>
-                        
-                        <div className="space-y-2">
-                            {(field.keyValueOptions || []).map((opt, optIdx) => (
-                                <div key={optIdx} className="grid grid-cols-[1fr_1fr_20px] gap-2 items-center">
-                                    <input 
-                                        type="text" 
-                                        value={opt.key}
-                                        onChange={(e) => updateKeyValueOption(field.id, optIdx, e.target.value, opt.value, field.keyValueOptions || [])}
-                                        className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-slate-200 focus:border-indigo-500 outline-none placeholder-slate-600"
-                                        placeholder="Label"
-                                    />
-                                    <input 
-                                        type="text" 
-                                        value={opt.value}
-                                        onChange={(e) => updateKeyValueOption(field.id, optIdx, opt.key, e.target.value, field.keyValueOptions || [])}
-                                        className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-indigo-300 font-mono focus:border-indigo-500 outline-none placeholder-slate-600"
-                                        placeholder="Value"
-                                    />
-                                    <button 
-                                        onClick={() => removeKeyValueOption(field.id, optIdx, field.keyValueOptions || [])}
-                                        className="text-slate-600 hover:text-red-400 flex justify-center items-center h-full w-full"
-                                        title="Remove Option"
-                                    >
-                                        <X size={14} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                        
-                        <button 
-                            onClick={() => addKeyValueOption(field.id, field.keyValueOptions)}
-                            className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 mt-3 px-1 py-1 hover:bg-slate-900 rounded w-full justify-center border border-dashed border-slate-800 hover:border-indigo-500/50 transition-colors"
-                        >
-                            <Plus size={12} /> Add Option
-                        </button>
+                  <div className="bg-slate-950 border border-slate-700 rounded p-2 mt-2">
+                    <label className="block text-[10px] uppercase font-bold text-slate-500 mb-2">Mapped Options</label>
+                    <div className="grid grid-cols-[1fr_1fr_20px] gap-2 items-center mb-2">
+                      <span className="text-[10px] text-slate-400 font-medium pl-1">Display Label</span>
+                      <span className="text-[10px] text-slate-400 font-medium pl-1">Export Value</span>
+                      <span></span>
                     </div>
+
+                    <div className="space-y-2">
+                      {(field.keyValueOptions || []).map((opt, optIdx) => (
+                        <div key={optIdx} className="grid grid-cols-[1fr_1fr_20px] gap-2 items-center">
+                          <input
+                            type="text"
+                            value={opt.key}
+                            onChange={(e) => updateKeyValueOption(field.id, optIdx, e.target.value, opt.value, field.keyValueOptions || [])}
+                            className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-slate-200 focus:border-indigo-500 outline-none placeholder-slate-600"
+                            placeholder="Label"
+                          />
+                          <input
+                            type="text"
+                            value={opt.value}
+                            onChange={(e) => updateKeyValueOption(field.id, optIdx, opt.key, e.target.value, field.keyValueOptions || [])}
+                            className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-indigo-300 font-mono focus:border-indigo-500 outline-none placeholder-slate-600"
+                            placeholder="Value"
+                          />
+                          <button
+                            onClick={() => removeKeyValueOption(field.id, optIdx, field.keyValueOptions || [])}
+                            className="text-slate-600 hover:text-red-400 flex justify-center items-center h-full w-full"
+                            title="Remove Option"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => addKeyValueOption(field.id, field.keyValueOptions)}
+                      className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 mt-3 px-1 py-1 hover:bg-slate-900 rounded w-full justify-center border border-dashed border-slate-800 hover:border-indigo-500/50 transition-colors"
+                    >
+                      <Plus size={12} /> Add Option
+                    </button>
+                  </div>
                 )}
               </div>
 

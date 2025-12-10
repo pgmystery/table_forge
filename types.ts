@@ -3,8 +3,9 @@ export enum FieldType {
   Number = 'number',
   Boolean = 'boolean',
   Select = 'select',
-  KeyValueSelect = 'key_value_select', // New type
-  Image = 'image', // Stores a URL
+  KeyValueSelect = 'key_value_select',
+  ImageURL = 'image_url', // Link to an image on the web
+  ImageFile = 'image_file', // Local file upload (Base64 storage, Filename export)
   LongText = 'longtext'
 }
 
@@ -17,16 +18,24 @@ export interface FieldDefinition {
   defaultValue?: any;
 }
 
-export type RowData = Record<string, any>;
+export interface RowData {
+  __groupId?: string;
+  [key: string]: any;
+}
+
+export interface GroupDefinition {
+  id: string;
+  name: string;
+  color?: string;
+  collapsed?: boolean;
+  assetPrefix?: string; // Group-specific asset prefix (overrides global if set)
+}
 
 export interface ProjectData {
   name: string;
   schema: FieldDefinition[];
+  groups: GroupDefinition[];
   rows: RowData[];
-}
-
-export interface AiGenerationConfig {
-  apiKey?: string;
-  prompt?: string;
-  count?: number;
+  assetPrefix?: string; // Global prefix for local assets (e.g. "assets/sprites/")
+  csvSeparator?: string; // Preferred CSV separator character
 }

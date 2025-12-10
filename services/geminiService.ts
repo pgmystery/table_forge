@@ -8,8 +8,8 @@ const mapFieldTypeToGeminiType = (field: FieldDefinition): Schema => {
     case FieldType.Boolean:
       return { type: Type.BOOLEAN, description: field.name };
     case FieldType.Select:
-      return { 
-        type: Type.STRING, 
+      return {
+        type: Type.STRING,
         description: `${field.name} (Must be one of: ${field.options?.join(', ')})`,
         enum: field.options
       };
@@ -20,8 +20,10 @@ const mapFieldTypeToGeminiType = (field: FieldDefinition): Schema => {
         description: `${field.name} (Select the code/value that matches the description: ${field.keyValueOptions?.map(o => `${o.value} (${o.key})`).join(', ')})`,
         enum: field.keyValueOptions?.map(o => o.value)
       };
-    case FieldType.Image:
+    case FieldType.ImageURL:
       return { type: Type.STRING, description: `A creative visual description or URL for ${field.name}` };
+    case FieldType.ImageFile:
+      return { type: Type.STRING, description: `A hypothetical filename for the ${field.name} image asset (e.g. 'sword_icon.png')` };
     default:
       return { type: Type.STRING, description: field.name };
   }
@@ -54,7 +56,8 @@ export const generateGameContent = async (
       contents: `Generate a single creative and unique item for a board game database.
       Context: ${userPrompt || "A fantasy board game item."}
       
-      For 'image' fields, provide a short visual description text, not a URL.
+      For 'image_url' fields, provide a short visual description text, not a URL.
+      For 'image_file' fields, provide a realistic filename.
       Ensure the data strictly follows the provided schema constraints.`,
       config: {
         responseMimeType: "application/json",
