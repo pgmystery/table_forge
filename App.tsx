@@ -46,7 +46,43 @@ const App: React.FC = () => {
   const apiKey = process.env.API_KEY;
 
   const handleSchemaChange = (newSchema: FieldDefinition[]) => {
-    setProject(prev => ({ ...prev, schema: newSchema }));
+    setProject(prev => {
+      let updatedRows = [...prev.rows];
+      let rowsUpdated = false;
+
+      newSchema.forEach(newField => {
+        if (newField.type !== FieldType.KeyValueSelect) return;
+
+        const oldField = prev.schema.find(f => f.id === newField.id);
+        if (!oldField || oldField.type !== FieldType.KeyValueSelect) return;
+
+        const newOpts = newField.keyValueOptions || [];
+        const oldOpts = oldField.keyValueOptions || [];
+
+        // Heuristic: Only migrate if option count matches (implies edit, not add/remove)
+        if (newOpts.length === oldOpts.length) {
+          newOpts.forEach((newOpt, idx) => {
+            const oldOpt = oldOpts[idx];
+            if (oldOpt.value !== newOpt.value) {
+              // Value definition changed, update corresponding row data
+              updatedRows = updatedRows.map(row => {
+                if (row[newField.id] === oldOpt.value) {
+                  rowsUpdated = true;
+                  return { ...row, [newField.id]: newOpt.value };
+                }
+                return row;
+              });
+            }
+          });
+        }
+      });
+
+      return {
+        ...prev,
+        schema: newSchema,
+        rows: rowsUpdated ? updatedRows : prev.rows
+      };
+    });
   };
 
   const handleRowsChange = (newRows: RowData[]) => {
